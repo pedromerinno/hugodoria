@@ -1,20 +1,42 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { SpiderCursor } from "@/components/ui/spider-cursor";
 
+// Decide em runtime se o canvas animado vale o custo. Em devices touch
+// (sem cursor real) o efeito perde o sentido — e mesmo em desktop, se o
+// usuário pediu reduced-motion, respeitamos a preferência e devolvemos
+// um fundo sólido. A decisão acontece no mount para não causar hydration
+// mismatch (SSR sempre renderiza o canvas; o cliente desliga se preciso).
+function useShouldRenderSpider() {
+  const [render, setRender] = useState(true);
+  useEffect(() => {
+    const noCursor = window.matchMedia("(hover: none)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (noCursor || reduced) setRender(false);
+  }, []);
+  return render;
+}
+
 export default function Challenges() {
+  const renderSpider = useShouldRenderSpider();
+
   return (
     <section id="desafios" className="w-full bg-sand pb-[24px]">
       <div className="w-full px-4 sm:px-6 lg:px-[15px]">
         <div className="relative isolate w-full overflow-hidden rounded-[24px] bg-primary text-white">
-          {/* Animated ambient background */}
-          <div className="pointer-events-none absolute inset-0">
-            <SpiderCursor
-              backgroundColor="#0015ff"
-              strokeColor="rgba(210, 225, 255, 0.85)"
-              spiderCount={2}
-            />
-          </div>
+          {/* Animated ambient background — apenas onde faz sentido */}
+          {renderSpider && (
+            <div className="pointer-events-none absolute inset-0">
+              <SpiderCursor
+                backgroundColor="#0015ff"
+                strokeColor="rgba(210, 225, 255, 0.85)"
+                spiderCount={2}
+              />
+            </div>
+          )}
 
           {/* Soft vignette for legibility on top of the canvas */}
           <div

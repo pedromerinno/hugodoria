@@ -17,12 +17,12 @@ const especialidades = [
   "Neuralgia do Trigêmio",
   "Cavernomas",
   "Tumores Cerebrais",
-  "Neuralgia do Trigêmio",
 ];
 
+// Telefone deliberadamente omitido até que o número oficial esteja disponível
+// — preferimos esconder a linha do que publicar um placeholder dummy ao vivo.
 const contatos = [
   { label: "contato@hugodoria.com", href: "mailto:contato@hugodoria.com" },
-  { label: "(00) 00000-0000", href: "tel:0000000000" },
 ];
 
 function SocialIcon({
@@ -55,11 +55,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 pb-12 sm:grid-cols-2 lg:flex lg:items-start lg:justify-between lg:gap-12 lg:pb-[80px]">
           {/* Brand + address */}
           <div className="flex max-w-[384px] flex-col gap-[38px]">
-            <img
-              src="/assets/logo-footer.svg"
+            <Image
+              src="/assets/logo-neurosurgic.svg"
               alt="Neurosurgic"
-              width={172}
-              height={47}
+              width={176}
+              height={51}
               className="block h-auto w-[140px] lg:w-[172px]"
             />
             <p className="m-0 font-display text-[14px] font-normal leading-[1.5] text-white">

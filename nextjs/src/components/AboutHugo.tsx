@@ -42,7 +42,11 @@ export default function AboutHugo() {
             </Link>
           </div>
 
-          <div className="relative aspect-[691/720] w-full overflow-hidden rounded-[24px]">
+          {/* Mobile: 4:5 evita que a foto ocupe quase toda a tela em
+              telas estreitas (o original ~1:1 forçava o usuário a rolar
+              uma viewport inteira só pelo retrato). 691/720 só a partir
+              de sm onde já há mais respiro horizontal. */}
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[24px] sm:aspect-[691/720]">
             <Image
               src="/assets/img-dr-01.jpg"
               alt="Dr. Hugo Dória"

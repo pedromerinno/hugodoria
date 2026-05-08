@@ -74,7 +74,10 @@ function Bullet({ children }: { children: React.ReactNode }) {
       <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white/10 backdrop-blur-md">
         <div className="h-[7.33px] w-[7.33px] rounded-full bg-bullet" />
       </div>
-      <p className="m-0 text-[14px] font-normal leading-[1.5] tracking-tighterDisplay text-white/50 sm:text-[16px]">
+      {/* /50 reprovava em WCAG AA sobre o fundo ink (~3.2:1). /75 leva
+          para ~4.7:1 e mantém a hierarquia visual em relação aos títulos
+          em branco puro acima. */}
+      <p className="m-0 text-[14px] font-normal leading-[1.5] tracking-tighterDisplay text-white/75 sm:text-[16px]">
         {children}
       </p>
     </div>
@@ -86,6 +89,25 @@ export default function Pillars() {
   const dotRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
   const articlesRef = useRef<Array<HTMLElement | null>>([]);
+  const borderRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // Pausa o conic-gradient infinito quando o card está fora da viewport.
+  // Em mobile, especialmente, evita que 4 animações simultâneas drenem
+  // a GPU enquanto o usuário lê outra parte da página.
+  useEffect(() => {
+    const nodes = borderRefs.current.filter(Boolean) as HTMLDivElement[];
+    if (!nodes.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          (e.target as HTMLElement).classList.toggle("is-visible", e.isIntersecting);
+        }
+      },
+      { rootMargin: "10% 0px", threshold: 0 }
+    );
+    nodes.forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const timeline = timelineRef.current;
@@ -93,13 +115,29 @@ export default function Pillars() {
     const fill = fillRef.current;
     if (!timeline || !dot || !fill) return;
 
+    // O timeline vertical (dot + fill + active-article-fade) só faz
+    // sentido na coluna paralela visível em desktop. No mobile os cards
+    // viram uma pilha vertical e "apagar" os não-ativos rebaixava cards
+    // que o usuário ainda estava lendo na rolagem natural — leitura
+    // sequencial > destaque do ativo. Bind direto ao matchMedia para que
+    // resize entre breakpoints reaplique a regra.
+    const desktop = window.matchMedia("(min-width: 1024px)");
     let rafId = 0;
+    let attached = false;
+
+    const resetArticles = () => {
+      const articles = articlesRef.current;
+      for (let i = 0; i < articles.length; i++) {
+        const el = articles[i];
+        if (!el) continue;
+        el.style.opacity = "1";
+      }
+    };
 
     const update = () => {
       rafId = 0;
       const rect = timeline.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      // Âncora a 50% do viewport — onde o olho naturalmente está focado
       const anchor = vh * 0.5;
       const progress = Math.max(
         0,
@@ -136,14 +174,37 @@ export default function Pillars() {
       if (!rafId) rafId = requestAnimationFrame(update);
     };
 
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    const attach = () => {
+      if (attached) return;
+      attached = true;
+      update();
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule);
+    };
 
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
+    const detach = () => {
+      if (!attached) return;
+      attached = false;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
+      resetArticles();
+    };
+
+    const apply = () => {
+      if (desktop.matches) attach();
+      else detach();
+    };
+
+    apply();
+    desktop.addEventListener("change", apply);
+
+    return () => {
+      desktop.removeEventListener("change", apply);
+      detach();
     };
   }, []);
 
@@ -287,6 +348,9 @@ export default function Pillars() {
                     {/* Image card — animated conic border + halftone dots */}
                     <div className="relative w-full lg:flex lg:justify-end">
                       <div
+                        ref={(el) => {
+                          borderRefs.current[i] = el;
+                        }}
                         className="animated-border relative aspect-[482/514] w-full max-w-[420px] rounded-[16px] p-[1.5px] lg:max-w-[482px]"
                         style={{
                           animationDelay: `${i * -1.5}s`,

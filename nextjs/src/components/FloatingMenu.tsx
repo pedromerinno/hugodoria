@@ -9,6 +9,14 @@ const navItems = [
   { label: "Dr. Hugo Dória", href: "#trajetoria", hasMenu: false },
 ];
 
+// Mobile keeps the labels short — same destinations as desktop but the
+// label fits the constrained pill width. Hugo's section keeps a person-first
+// label since "Trajetória" alone would lose the brand.
+const mobileNavItems = [
+  { label: "Cursos", href: "#programas" },
+  { label: "Hugo", href: "#trajetoria" },
+];
+
 function ChevronDown({ className = "" }: { className?: string }) {
   return (
     <svg
@@ -97,7 +105,7 @@ export default function FloatingMenu() {
           "max-w-[min(960px,calc(100vw-32px))]",
         ].join(" ")}
       >
-        {/* Desktop items */}
+        {/* Desktop items — full set */}
         <div className="hidden items-center lg:flex">
           {navItems.map((item) => {
             const isActive = active === item.label;
@@ -137,22 +145,20 @@ export default function FloatingMenu() {
           ))}
         </div>
 
-        {/* Mobile compact label */}
-        <Link
-          href="#topo"
-          className="ml-1 flex h-[40px] items-center gap-2 rounded-full px-3 text-[13px] font-medium text-white/85 md:hidden"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-            <path
-              d="M7 11V3M3 7l4-4 4 4"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>Topo</span>
-        </Link>
+        {/* Mobile — short labels for the two highest-value destinations.
+            The hamburger drawer in the header is the full nav; this is
+            for jump-back convenience while the user is scrolling. */}
+        <div className="flex items-center md:hidden">
+          {mobileNavItems.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="flex h-[40px] items-center rounded-full px-[12px] text-[13px] font-medium text-white/85 transition-colors active:bg-white/10"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
 
         {/* CTA */}
         <Link

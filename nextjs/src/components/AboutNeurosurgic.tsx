@@ -474,14 +474,21 @@ export default function AboutNeurosurgic() {
             <span>Inscrever-se</span>
           </Link>
 
-          <div className="grid w-full max-w-[640px] grid-cols-2 gap-3 pt-2">
-            <Image
-              src="/assets/lib-1.webp"
-              alt=""
-              width={290}
-              height={362}
-              className="block h-auto w-full rounded-[20px] object-cover"
-            />
+          {/* Mobile media stack — empilhamos em telas pequenas (<sm) porque
+              foto-retrato + vídeo-paisagem lado a lado criava uma "escada"
+              visual. A partir de sm voltamos ao grid 2-col mas com aspect
+              ratios harmonizados (4/5 para a foto + video preserva proporção
+              compatível ao 16/9 mas com presença visual equivalente). */}
+          <div className="flex w-full max-w-[640px] flex-col gap-3 pt-2 sm:grid sm:grid-cols-2">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[20px] sm:aspect-[290/362]">
+              <Image
+                src="/assets/lib-1.webp"
+                alt=""
+                fill
+                sizes="(min-width: 640px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
             <div
               ref={mobileWrapRef}
               className="relative aspect-video w-full overflow-hidden rounded-[20px] bg-ink/5"

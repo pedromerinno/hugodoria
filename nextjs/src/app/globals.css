@@ -18,6 +18,24 @@ html {
   }
 }
 
+/* Âncoras de seção (#topo, #institucional, #programas, …) precisam
+   compensar a barra flutuante inferior e o eventual notch superior em
+   alguns navegadores mobile. scroll-margin-top é a forma canônica de
+   evitar que o smooth-scroll pare "atrás" do alvo. */
+section[id],
+[id="topo"],
+[id="contato"] {
+  scroll-margin-top: 16px;
+}
+
+@media (min-width: 1024px) {
+  section[id],
+  [id="topo"],
+  [id="contato"] {
+    scroll-margin-top: 24px;
+  }
+}
+
 html,
 body {
   margin: 0;
@@ -100,10 +118,19 @@ body {
     );
   background-blend-mode: screen;
   animation: border-rotate 6s linear infinite;
+  animation-play-state: paused;
+}
+
+/* Quando o card entra na viewport, o componente troca este flag.
+   O efeito principal: 4 cards de Pillars não rodam o conic-gradient
+   simultâneo o tempo todo — só o(s) visível(eis) anima(m). */
+.animated-border.is-visible {
+  animation-play-state: running;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animated-border {
+  .animated-border,
+  .animated-border.is-visible {
     animation: none;
   }
 }

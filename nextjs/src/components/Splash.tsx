@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 
 const REDUCED_DURATION = 480;
 const FULL_DURATION = 1600;
+// Hard ceiling: even in the worst case we never lock the page beyond this.
+// Belt-and-suspenders against an animationend that never fires.
+const SAFETY_TIMEOUT = 2400;
 
 export default function Splash() {
   const [visible, setVisible] = useState(true);
@@ -19,13 +22,30 @@ export default function Splash() {
     const prevOverflow = html.style.overflow;
     html.style.overflow = "hidden";
 
-    const t = window.setTimeout(() => {
+    let dismissed = false;
+    const dismiss = () => {
+      if (dismissed) return;
+      dismissed = true;
       setVisible(false);
       html.style.overflow = prevOverflow;
-    }, duration);
+    };
+
+    const t = window.setTimeout(dismiss, duration);
+    const safety = window.setTimeout(dismiss, SAFETY_TIMEOUT);
+
+    // Skip on first user gesture — a tap, key, or scroll signals intent
+    // to engage with the page; respect it instead of holding them hostage
+    // to the intro animation. AbortController removes all listeners at once.
+    const ac = new AbortController();
+    const onSkip = () => dismiss();
+    window.addEventListener("pointerdown", onSkip, { signal: ac.signal, passive: true });
+    window.addEventListener("keydown", onSkip, { signal: ac.signal });
+    window.addEventListener("touchstart", onSkip, { signal: ac.signal, passive: true });
 
     return () => {
       window.clearTimeout(t);
+      window.clearTimeout(safety);
+      ac.abort();
       html.style.overflow = prevOverflow;
     };
   }, []);

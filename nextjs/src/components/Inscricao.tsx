@@ -173,7 +173,7 @@ export default function Inscricao() {
                   id="programa"
                   name="programa"
                   defaultValue="indeciso"
-                  className="h-[52px] w-full appearance-none rounded-[14px] border border-primary/15 bg-white px-4 pr-10 font-display text-[15px] text-primary outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  className="h-[52px] w-full appearance-none rounded-[14px] border border-primary/15 bg-white px-4 pr-10 font-display text-[15px] text-primary outline-none transition-colors focus:border-primary focus:ring-[3px] focus:ring-primary/35"
                 >
                   {PROGRAMS.map((p) => (
                     <option key={p.value} value={p.value}>
@@ -320,8 +320,8 @@ function Field({
         className={[
           "h-[52px] w-full rounded-[14px] border bg-white px-4 font-display text-[15px] text-primary outline-none transition-colors",
           error
-            ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-            : "border-primary/15 focus:border-primary focus:ring-2 focus:ring-primary/20",
+            ? "border-red-400 focus:border-red-500 focus:ring-[3px] focus:ring-red-500/30"
+            : "border-primary/15 focus:border-primary focus:ring-[3px] focus:ring-primary/35",
         ].join(" ")}
       />
       {error && (
