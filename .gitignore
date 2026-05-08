@@ -20,9 +20,16 @@ node_modules/
 .next/
 out/
 build/
+dist/
 coverage/
 *.tsbuildinfo
 next-env.d.ts
+
+# ───────────────────────────────────────────────────────────────
+# Monorepo / Turborepo
+# ───────────────────────────────────────────────────────────────
+.turbo/
+.pnpm-store/
 
 # Environment — never commit local secrets / keys
 .env
